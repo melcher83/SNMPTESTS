@@ -1,12 +1,12 @@
 from pysnmp.hlapi import *
 
-def SNMP_V2MIB_GET(var,instance):
+def SNMP_V2MIB_GET(HOST, COMMUNITY, VAR, INSTANCE):
 
     iterator = getCmd(SnmpEngine(),
-                  CommunityData('public'),
-                  UdpTransportTarget(('192.168.127.52', 161)),
-                  ContextData(),
-                  ObjectType(ObjectIdentity('SNMPv2-MIB', var, instance)))
+                      CommunityData(COMMUNITY),
+                      UdpTransportTarget((HOST, 161)),
+                      ContextData(),
+                      ObjectType(ObjectIdentity('SNMPv2-MIB', VAR, INSTANCE)))
 
     errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
 
@@ -17,6 +17,7 @@ def SNMP_V2MIB_GET(var,instance):
             print('%s at %s' % (errorStatus.prettyPrint(), varBinds[int(errorIndex)-1] if errorIndex else '?'))
         else:
             for varBind in varBinds:  # SNMP response contents
-                print(' = '.join([x.prettyPrint() for x in varBind]))
+                return [x.prettyPrint() for x in varBind]
 
-SNMP_V2MIB_GET('sysDescr',0)
+y=SNMP_V2MIB_GET('192.168.127.52','public','sysDescr',0)
+print(y[1])
