@@ -19,5 +19,13 @@ def SNMP_V2MIB_GET(HOST, COMMUNITY, VAR, INSTANCE):
             for varBind in varBinds:  # SNMP response contents
                 return [x.prettyPrint() for x in varBind]
 
-y=SNMP_V2MIB_GET('192.168.127.52','public','sysDescr',0)
-print(y[1])
+class SNMP_OBJECT:
+    def __init__(self,HOST,COMMUNITY):
+        self.HOST=HOST
+        self.COMMUNITY=COMMUNITY
+        self.sysDescr=SNMP_V2MIB_GET(self.HOST,self.COMMUNITY,'sysDescr',0)
+    def GET_DESC(self):
+        return self.sysDescr[1]
+
+SWITCH1=SNMP_OBJECT('192.168.127.52','public')
+print(SWITCH1.GET_DESC())
