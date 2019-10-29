@@ -112,12 +112,17 @@ class NET_DISC:
 
 network=NET_DISC('192.168.127.0','24')
 network.DISCOVER()
+
+
+x=0
+SWITCH = []
 for host in network.GET_NET():
     print('----------------------------------------------------')
     print('Host : %s (%s)' % (host, network.nm[host].hostname()))
     print('State : %s' % network.nm[host].state())
-    SWITCH=SNMP_OBJECT(host,'public')
-    print('NAME' + " " + SWITCH.GET_NAME())
+    SWITCH.append(SNMP_OBJECT(host,'public'))
+    print('NAME' + " " + SWITCH[x].GET_NAME())
+    x+=1
 
 
 
