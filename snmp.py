@@ -19,13 +19,14 @@ def SNMP_V2MIB_GET(HOST, COMMUNITY, VAR, INSTANCE):
             for varBind in varBinds:  # SNMP response contents
                 return [x.prettyPrint() for x in varBind]
 
-def SNMP_LLDP_GET(HOST, COMMUNITY, VAR, INSTANCE):
+def SNMP_OID_GET(HOST, COMMUNITY, OID):
+
 
     iterator = getCmd(SnmpEngine(),
                       CommunityData(COMMUNITY),
                       UdpTransportTarget((HOST, 161)),
                       ContextData(),
-                      ObjectType(ObjectIdentity('SNMPv2-MIB', VAR, INSTANCE)))
+                      ObjectType(ObjectIdentity(OID)),lookupMib=False)
 
     errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
 
@@ -49,6 +50,7 @@ class SNMP_OBJECT:
         self.sysObjectID=SNMP_V2MIB_GET(self.HOST,self.COMMUNITY,'sysObjectID',0)
         self.sysUpTime=SNMP_V2MIB_GET(self.HOST,self.COMMUNITY,'sysUpTime',0)
         self.sysName=SNMP_V2MIB_GET(self.HOST,self.COMMUNITY,'sysName',0)
+
     def GET_DESC(self):
         return self.sysDescr[1]
     def GET_ID(self):
@@ -58,9 +60,11 @@ class SNMP_OBJECT:
     def GET_NAME(self):
         return self.sysName[1]
 
+
 SWITCH1=SNMP_OBJECT('192.168.127.52','public')
 print('NAME' + " " + SWITCH1.GET_NAME())
 print('sys desc' + " " + SWITCH1.GET_DESC())
 print('ID' + " " + SWITCH1.GET_ID())
 print('UPTIME' + " " + SWITCH1.GET_UPTIME())
+)
 
