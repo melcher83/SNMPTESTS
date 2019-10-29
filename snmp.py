@@ -1,6 +1,6 @@
 from pysnmp.hlapi import *
 import nmap
-
+import csv
 def SNMP_V2MIB_GET(HOST, COMMUNITY, VAR, INSTANCE):
 
     iterator = getCmd(SnmpEngine(),
@@ -51,7 +51,10 @@ class SNMP_OBJECT:
         self.sysObjectID=SNMP_V2MIB_GET(self.HOST,self.COMMUNITY,'sysObjectID',0)
         self.sysUpTime=SNMP_V2MIB_GET(self.HOST,self.COMMUNITY,'sysUpTime',0)
         self.sysName=SNMP_V2MIB_GET(self.HOST,self.COMMUNITY,'sysName',0)
-        self.IfNumber=(SNMP_OID_GET(self.HOST,self.COMMUNITY,'.1.3.6.1.2.1.2.1.0')[1]) #number of interfaces, includes management interface, and SVI's, etc...
+        if SNMP_OID_GET(self.HOST,self.COMMUNITY,'.1.3.6.1.2.1.2.1.0') is not None:
+            self.IfNumber=(SNMP_OID_GET(self.HOST,self.COMMUNITY,'.1.3.6.1.2.1.2.1.0')[1]) #number of interfaces, includes management interface, and SVI's, etc...
+        else:
+            self.IfNumber=1
 
     def GET_DESC(self):
         return self.sysDescr[1]
@@ -71,9 +74,18 @@ class SNMP_OBJECT:
 
         return uptime
     def GET_NAME(self):
-        return self.sysName[1]
+
+        if self.sysName is not None:
+            return self.sysName[1]
+        else:
+            return "No Name"
+
     def GET_IFNUM(self):
-        return self.IfNumber
+        if self.IfNumber is not None:
+            return self.IfNumber
+        else:
+            return 1
+
 
 class NET_DISC:
     def __init__(self,NET,MASK):
@@ -82,9 +94,9 @@ class NET_DISC:
         self.nm = nmap.PortScanner()
     def DISCOVER(self):
         nNET=self.NETWORK + "/" + self.NETMASK
-        self.nm.scan(hosts=nNET, arguments='-sU -p 161')
+        self.nm.scan(hosts=nNET, arguments='-n -sP -PE -PA21,23,80,3389,22,443')
     def GET_NET(self):
-        return self.nm.csv()
+        return self.nm.all_hosts()
 
 
 
@@ -100,5 +112,12 @@ class NET_DISC:
 
 network=NET_DISC('192.168.127.0','24')
 network.DISCOVER()
-print(network.GET_NET())
+for host in network.GET_NET():
+    print('----------------------------------------------------')
+    print('Host : %s (%s)' % (host, network.nm[host].hostname()))
+    print('State : %s' % network.nm[host].state())
+    SWITCH=SNMP_OBJECT(host,'public')
+    print('NAME' + " " + SWITCH.GET_NAME())
+
+
 
