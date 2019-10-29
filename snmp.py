@@ -1,4 +1,5 @@
 from pysnmp.hlapi import *
+import nmap
 
 def SNMP_V2MIB_GET(HOST, COMMUNITY, VAR, INSTANCE):
 
@@ -78,14 +79,26 @@ class NET_DISC:
     def __init__(self,NET,MASK):
         self.NETWORK=NET
         self.NETMASK=MASK
+        self.nm = nmap.PortScanner()
+    def DISCOVER(self):
+        nNET=self.NETWORK + "/" + self.NETMASK
+        self.nm.scan(hosts=nNET, arguments='-sU -p 161')
+    def GET_NET(self):
+        return self.nm.csv()
 
 
 
 
-SWITCH1=SNMP_OBJECT('192.168.127.52','public')
-print('NAME' + " " + SWITCH1.GET_NAME())
-print('sys desc' + " " + SWITCH1.GET_DESC())
-print('ID' + " " + SWITCH1.GET_ID())
-print('UPTIME' + " " + SWITCH1.GET_UPTIME())
-print('Number of Interfaces: ' + SWITCH1.GET_IFNUM())
+
+
+#SWITCH1=SNMP_OBJECT('192.168.127.52','public')
+#print('NAME' + " " + SWITCH1.GET_NAME())
+#print('sys desc' + " " + SWITCH1.GET_DESC())
+#print('ID' + " " + SWITCH1.GET_ID())
+#print('UPTIME' + " " + SWITCH1.GET_UPTIME())
+#print('Number of Interfaces: ' + SWITCH1.GET_IFNUM())
+
+network=NET_DISC('192.168.127.0','24')
+network.DISCOVER()
+print(network.GET_NET())
 
