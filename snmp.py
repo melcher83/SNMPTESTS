@@ -57,11 +57,29 @@ class SNMP_OBJECT:
     def GET_ID(self):
         return self.sysObjectID[1]
     def GET_UPTIME(self):
-        return self.sysUpTime[1]
+        n = int(self.sysUpTime[1])/100
+        day=n//(24*3600)
+
+        n = n % (24 * 3600)
+        hour = n//3600
+        n %= 3600
+        minutes = n//60
+        n %=60
+        seconds = n
+        uptime = "Days: " + " " + str(day) + " ,  Hours : " + str(hour) + " ,  Minutes : " + str(minutes) + " ,  Seconds : " + str(seconds)
+
+        return uptime
     def GET_NAME(self):
         return self.sysName[1]
     def GET_IFNUM(self):
         return self.IfNumber
+
+class NET_DISC:
+    def __init__(self,NET,MASK):
+        self.NETWORK=NET
+        self.NETMASK=MASK
+
+
 
 
 SWITCH1=SNMP_OBJECT('192.168.127.52','public')
