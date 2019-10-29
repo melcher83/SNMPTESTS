@@ -115,14 +115,16 @@ network.DISCOVER()
 
 
 x=0
-SWITCH = []
+DEVICE = []
 for host in network.GET_NET():
     print('----------------------------------------------------')
     print('Host : %s (%s)' % (host, network.nm[host].hostname()))
     print('State : %s' % network.nm[host].state())
-    SWITCH.append(SNMP_OBJECT(host,'public'))
-    print('NAME' + " " + SWITCH[x].GET_NAME())
+    DEVICE.append(SNMP_OBJECT(host, 'public'))
+    print('NAME' + " " + DEVICE[x].GET_NAME())
     x+=1
+
+print(len(DEVICE))
 
 
 
