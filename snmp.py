@@ -50,6 +50,7 @@ class SNMP_OBJECT:
         self.sysObjectID=SNMP_V2MIB_GET(self.HOST,self.COMMUNITY,'sysObjectID',0)
         self.sysUpTime=SNMP_V2MIB_GET(self.HOST,self.COMMUNITY,'sysUpTime',0)
         self.sysName=SNMP_V2MIB_GET(self.HOST,self.COMMUNITY,'sysName',0)
+        self.IfNumber=(SNMP_OID_GET(self.HOST,self.COMMUNITY,'.1.3.6.1.2.1.2.1.0')[1]) #number of interfaces, includes management interface, and SVI's, etc...
 
     def GET_DESC(self):
         return self.sysDescr[1]
@@ -59,6 +60,8 @@ class SNMP_OBJECT:
         return self.sysUpTime[1]
     def GET_NAME(self):
         return self.sysName[1]
+    def GET_IFNUM(self):
+        return self.IfNumber
 
 
 SWITCH1=SNMP_OBJECT('192.168.127.52','public')
@@ -66,5 +69,5 @@ print('NAME' + " " + SWITCH1.GET_NAME())
 print('sys desc' + " " + SWITCH1.GET_DESC())
 print('ID' + " " + SWITCH1.GET_ID())
 print('UPTIME' + " " + SWITCH1.GET_UPTIME())
-)
+print('Number of Interfaces: ' + SWITCH1.GET_IFNUM())
 
