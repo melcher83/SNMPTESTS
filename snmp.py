@@ -19,6 +19,28 @@ def SNMP_V2MIB_GET(HOST, COMMUNITY, VAR, INSTANCE):
             for varBind in varBinds:  # SNMP response contents
                 return [x.prettyPrint() for x in varBind]
 
+def SNMP_LLDP_GET(HOST, COMMUNITY, VAR, INSTANCE):
+
+    iterator = getCmd(SnmpEngine(),
+                      CommunityData(COMMUNITY),
+                      UdpTransportTarget((HOST, 161)),
+                      ContextData(),
+                      ObjectType(ObjectIdentity('SNMPv2-MIB', VAR, INSTANCE)))
+
+    errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
+
+    if errorIndication:  # SNMP engine errors
+        print(errorIndication)
+    else:
+        if errorStatus:  # SNMP agent errors
+            print('%s at %s' % (errorStatus.prettyPrint(), varBinds[int(errorIndex)-1] if errorIndex else '?'))
+        else:
+            for varBind in varBinds:  # SNMP response contents
+                return [x.prettyPrint() for x in varBind]
+
+
+
+
 class SNMP_OBJECT:
     def __init__(self,HOST,COMMUNITY):
         self.HOST=HOST
