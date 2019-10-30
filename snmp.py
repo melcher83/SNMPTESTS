@@ -5,7 +5,7 @@ def SNMP_V2MIB_GET(HOST, COMMUNITY, VAR, INSTANCE):
 
     iterator = getCmd(SnmpEngine(),
                       CommunityData(COMMUNITY),
-                      UdpTransportTarget((HOST, 161)),
+                      UdpTransportTarget((HOST, 161),retries=3),
                       ContextData(),
                       ObjectType(ObjectIdentity('SNMPv2-MIB', VAR, INSTANCE)))
 
@@ -25,7 +25,7 @@ def SNMP_OID_GET(HOST, COMMUNITY, OID):
 
     iterator = getCmd(SnmpEngine(),
                       CommunityData(COMMUNITY),
-                      UdpTransportTarget((HOST, 161)),
+                      UdpTransportTarget((HOST, 161),retries=3),
                       ContextData(),
                       ObjectType(ObjectIdentity(OID)),lookupMib=False)
 
@@ -55,6 +55,9 @@ class SNMP_OBJECT:
             self.IfNumber=(SNMP_OID_GET(self.HOST,self.COMMUNITY,'.1.3.6.1.2.1.2.1.0')[1]) #number of interfaces, includes management interface, and SVI's, etc...
         else:
             self.IfNumber=1
+        self.ifPhysAddress=[]
+        self.ifPhysAddress=self.GET_IF_MAC()
+
 
     def GET_DESC(self):
         return self.sysDescr[1]
@@ -85,6 +88,19 @@ class SNMP_OBJECT:
             return self.IfNumber
         else:
             return 1
+    def GET_IF_MAC(self):
+        x=0
+        while x < int(self.IfNumber):
+            if SNMP_OID_GET(self.HOST,self.COMMUNITY,'.1.3.6.1.2.1.2.2.1.6.' + str(x+1)) is not None:
+                self.ifPhysAddress.append(SNMP_OID_GET(self.HOST,self.COMMUNITY,'.1.3.6.1.2.1.2.2.1.6.' + str(x+1))[1])
+                print(self.ifPhysAddress[x])
+                x+=1
+
+
+
+
+
+
 
 
 class NET_DISC:
@@ -110,7 +126,7 @@ class NET_DISC:
 #print('UPTIME' + " " + SWITCH1.GET_UPTIME())
 #print('Number of Interfaces: ' + SWITCH1.GET_IFNUM())
 
-network=NET_DISC('192.168.127.0','24')
+network=NET_DISC('192.168.127.48','29')
 network.DISCOVER()
 
 
