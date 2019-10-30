@@ -95,6 +95,8 @@ class SNMP_OBJECT:
                 self.ifPhysAddress.append(SNMP_OID_GET(self.HOST,self.COMMUNITY,'.1.3.6.1.2.1.2.2.1.6.' + str(x+1))[1])
                 print(self.ifPhysAddress[x])
                 x+=1
+            else:
+                x+=1
 
 
 
