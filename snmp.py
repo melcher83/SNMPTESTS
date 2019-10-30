@@ -64,6 +64,7 @@ class SNMP_OBJECT:
     def GET_ID(self):
         return self.sysObjectID[1]
     def GET_UPTIME(self):
+        self.sysUpTime = SNMP_V2MIB_GET(self.HOST, self.COMMUNITY, 'sysUpTime', 0)
         n = int(self.sysUpTime[1])/100
         day=n//(24*3600)
 
@@ -77,7 +78,7 @@ class SNMP_OBJECT:
 
         return uptime
     def GET_NAME(self):
-
+        self.sysName = SNMP_V2MIB_GET(self.HOST, self.COMMUNITY, 'sysName', 0)
         if self.sysName is not None:
             return self.sysName[1]
         else:
@@ -117,15 +118,8 @@ class NET_DISC:
         return self.nm.all_hosts()
 
 
-
-
-
-#SWITCH1=SNMP_OBJECT('192.168.127.52','public')
-#print('NAME' + " " + SWITCH1.GET_NAME())
-#print('sys desc' + " " + SWITCH1.GET_DESC())
-#print('ID' + " " + SWITCH1.GET_ID())
-#print('UPTIME' + " " + SWITCH1.GET_UPTIME())
-#print('Number of Interfaces: ' + SWITCH1.GET_IFNUM())
+##########################################################################################
+#############################TEST CODE####################################################
 
 network=NET_DISC('192.168.127.48','24')
 network.DISCOVER()
