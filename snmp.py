@@ -26,6 +26,26 @@ def SNMP_V2MIB_GET(HOST, COMMUNITY, VAR, INSTANCE): #basic info gathering via SN
         else:
             for varBind in varBinds:  # SNMP response contents
                 return [x.prettyPrint() for x in varBind]
+def SNMP_MIB_WALK(HOST, COMMUNITY,MIB, VAR):
+    for (errorIndication,
+         errorStatus,
+         errorIndex,
+         varBinds) in nextCmd(SnmpEngine(),
+                              CommunityData(COMMUNITY),
+                              UdpTransportTarget((HOST, 161), retries=3),
+                              ContextData(),
+                              ObjectType(ObjectIdentity(MIB,VAR).addAsn1MibSource('MIBS','http://mibs.snmplabs.com/asn1/@mib@')),lexicographicMode=False):
+
+        if errorIndication:
+            print(errorIndication)
+            break
+        elif errorStatus:
+            print('%s at %s' % (errorStatus.prettyPrint(),
+                                errorIndex and varBinds[int(errorIndex) - 1][0] or '?'))
+            break
+        else:
+            for varBind in varBinds:
+                print(' = '.join([x.prettyPrint() for x in varBind]))
 
 def SNMP_MIB_GET(HOST, COMMUNITY,MIB, VAR, INSTANCE): #info gather via custom MIBS in MIBS folder or anything on the website mentioned.
 
@@ -164,6 +184,9 @@ class NET_DISC: #network discovery via nmap
 #    x+=1
 
 #print(len(DEVICE))
+
+
+print(SNMP_MIB_WALK('192.168.127.52','public','LLDP-MIB','lldpRemTable'))
 
 
 
