@@ -118,7 +118,6 @@ class NET_DISC:
 
 
 
-
 #SWITCH1=SNMP_OBJECT('192.168.127.52','public')
 #print('NAME' + " " + SWITCH1.GET_NAME())
 #print('sys desc' + " " + SWITCH1.GET_DESC())
@@ -126,7 +125,7 @@ class NET_DISC:
 #print('UPTIME' + " " + SWITCH1.GET_UPTIME())
 #print('Number of Interfaces: ' + SWITCH1.GET_IFNUM())
 
-network=NET_DISC('192.168.127.48','29')
+network=NET_DISC('192.168.127.48','24')
 network.DISCOVER()
 
 
