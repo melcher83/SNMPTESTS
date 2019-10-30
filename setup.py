@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='SNMPTESTS',
-    version='1.0',
+    version='0.1',
     packages=[''],
     url='https://github.com/melcher83/SNMPTESTS',
     license='GPL-2.0',

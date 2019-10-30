@@ -128,21 +128,21 @@ class NET_DISC: #network discovery via nmap
 ##########################################################################################
 #############################TEST CODE####################################################
 
-network=NET_DISC('192.168.127.48','24')
-network.DISCOVER()
+#network=NET_DISC('192.168.127.48','24')
+#network.DISCOVER()
 
 
-x=0
-DEVICE = []
-for host in network.GET_NET():
-    print('----------------------------------------------------')
-    print('Host : %s (%s)' % (host, network.nm[host].hostname()))
-    print('State : %s' % network.nm[host].state())
-    DEVICE.append(SNMP_OBJECT(host, 'public'))
-    print('NAME' + " " + DEVICE[x].GET_NAME())
-    x+=1
+#x=0
+#DEVICE = []
+#for host in network.GET_NET():
+#    print('----------------------------------------------------')
+#    print('Host : %s (%s)' % (host, network.nm[host].hostname()))
+#    print('State : %s' % network.nm[host].state())
+#    DEVICE.append(SNMP_OBJECT(host, 'public'))
+#    print('NAME' + " " + DEVICE[x].GET_NAME())
+#    x+=1
 
-print(len(DEVICE))
+#print(len(DEVICE))
 
 
 
