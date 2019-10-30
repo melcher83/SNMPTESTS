@@ -1,5 +1,5 @@
-#
-#
+#Jonathan Melcher
+#jonathan@vlan404notfound.com
 #
 #
 
@@ -15,6 +15,25 @@ def SNMP_V2MIB_GET(HOST, COMMUNITY, VAR, INSTANCE): #basic info gathering via SN
                       UdpTransportTarget((HOST, 161),retries=3),
                       ContextData(),
                       ObjectType(ObjectIdentity('SNMPv2-MIB', VAR, INSTANCE)))
+
+    errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
+
+    if errorIndication:  # SNMP engine errors
+        print(errorIndication)
+    else:
+        if errorStatus:  # SNMP agent errors
+            print('%s at %s' % (errorStatus.prettyPrint(), varBinds[int(errorIndex)-1] if errorIndex else '?'))
+        else:
+            for varBind in varBinds:  # SNMP response contents
+                return [x.prettyPrint() for x in varBind]
+
+def SNMP_MIB_GET(HOST, COMMUNITY,MIB, VAR, INSTANCE): #info gather via custom MIBS in MIBS folder or anything on the website mentioned.
+
+    iterator = getCmd(SnmpEngine(),
+                      CommunityData(COMMUNITY),
+                      UdpTransportTarget((HOST, 161),retries=3),
+                      ContextData(),
+                      ObjectType(ObjectIdentity(MIB, VAR, INSTANCE).addAsn1MibSource('MIBS','http://mibs.snmplabs.com/asn1/@mib@')))
 
     errorIndication, errorStatus, errorIndex, varBinds = next(iterator)
 
@@ -58,8 +77,8 @@ class SNMP_OBJECT: #Each device in network
         self.sysObjectID=SNMP_V2MIB_GET(self.HOST,self.COMMUNITY,'sysObjectID',0)
         self.sysUpTime=SNMP_V2MIB_GET(self.HOST,self.COMMUNITY,'sysUpTime',0)
         self.sysName=SNMP_V2MIB_GET(self.HOST,self.COMMUNITY,'sysName',0)
-        if SNMP_OID_GET(self.HOST,self.COMMUNITY,'.1.3.6.1.2.1.2.1.0') is not None:
-            self.IfNumber=(SNMP_OID_GET(self.HOST,self.COMMUNITY,'.1.3.6.1.2.1.2.1.0')[1]) #number of interfaces, includes management interface, and SVI's, etc...
+        if SNMP_MIB_GET(self.HOST,self.COMMUNITY,'IF-MIB','ifNumber',0) is not None:
+            self.IfNumber=(SNMP_MIB_GET(self.HOST,self.COMMUNITY,'IF-MIB','ifNumber',0)[1]) #number of interfaces, includes management interface, and SVI's, etc...
         else:
             self.IfNumber=1
         self.ifPhysAddress=[]
@@ -101,7 +120,7 @@ class SNMP_OBJECT: #Each device in network
         while x < int(self.IfNumber):
             if SNMP_OID_GET(self.HOST,self.COMMUNITY,'.1.3.6.1.2.1.2.2.1.6.' + str(x+1)) is not None:
                 self.ifPhysAddress.append(SNMP_OID_GET(self.HOST,self.COMMUNITY,'.1.3.6.1.2.1.2.2.1.6.' + str(x+1))[1])
-                print(self.ifPhysAddress[x])
+                #print(self.ifPhysAddress[x])
                 x+=1
             else:
                 x+=1
@@ -145,6 +164,9 @@ class NET_DISC: #network discovery via nmap
 #    x+=1
 
 #print(len(DEVICE))
+
+
+
 
 
 
