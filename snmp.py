@@ -1,7 +1,14 @@
+#
+#
+#
+#
+
 from pysnmp.hlapi import *
 import nmap
-import csv
-def SNMP_V2MIB_GET(HOST, COMMUNITY, VAR, INSTANCE):
+
+
+
+def SNMP_V2MIB_GET(HOST, COMMUNITY, VAR, INSTANCE): #basic info gathering via SNMPv2-MIB
 
     iterator = getCmd(SnmpEngine(),
                       CommunityData(COMMUNITY),
@@ -20,7 +27,7 @@ def SNMP_V2MIB_GET(HOST, COMMUNITY, VAR, INSTANCE):
             for varBind in varBinds:  # SNMP response contents
                 return [x.prettyPrint() for x in varBind]
 
-def SNMP_OID_GET(HOST, COMMUNITY, OID):
+def SNMP_OID_GET(HOST, COMMUNITY, OID): #more advanced gathering based on the OID
 
 
     iterator = getCmd(SnmpEngine(),
@@ -43,7 +50,7 @@ def SNMP_OID_GET(HOST, COMMUNITY, OID):
 
 
 
-class SNMP_OBJECT:
+class SNMP_OBJECT: #Each device in network
     def __init__(self,HOST,COMMUNITY):
         self.HOST=HOST
         self.COMMUNITY=COMMUNITY
@@ -63,7 +70,7 @@ class SNMP_OBJECT:
         return self.sysDescr[1]
     def GET_ID(self):
         return self.sysObjectID[1]
-    def GET_UPTIME(self):
+    def GET_UPTIME(self): #uptime is gathered in hundreths of a second and converted to day, hours, etc here
         self.sysUpTime = SNMP_V2MIB_GET(self.HOST, self.COMMUNITY, 'sysUpTime', 0)
         n = int(self.sysUpTime[1])/100
         day=n//(24*3600)
@@ -84,12 +91,12 @@ class SNMP_OBJECT:
         else:
             return "No Name"
 
-    def GET_IFNUM(self):
+    def GET_IFNUM(self): #number if interfaces, this is not perfect, for instance the hirschmann management interface shows up as int 85 despite there being only 11 on that switch
         if self.IfNumber is not None:
             return self.IfNumber
         else:
             return 1
-    def GET_IF_MAC(self):
+    def GET_IF_MAC(self): #gets MAC of interfaces in 0x Hex Format
         x=0
         while x < int(self.IfNumber):
             if SNMP_OID_GET(self.HOST,self.COMMUNITY,'.1.3.6.1.2.1.2.2.1.6.' + str(x+1)) is not None:
@@ -106,7 +113,7 @@ class SNMP_OBJECT:
 
 
 
-class NET_DISC:
+class NET_DISC: #network discovery via nmap
     def __init__(self,NET,MASK):
         self.NETWORK=NET
         self.NETMASK=MASK
