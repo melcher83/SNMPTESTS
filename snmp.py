@@ -105,6 +105,8 @@ class SNMP_OBJECT: #Each device in network
                 x+=1
             else:
                 x+=1
+    def GET_OID(self,OID):
+        return SNMP_OID_GET(self.HOST,self.COMMUNITY,OID)
 
 
 
